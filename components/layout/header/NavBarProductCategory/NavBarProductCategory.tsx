@@ -1,5 +1,5 @@
 /* eslint-disable spaced-comment */
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as React from 'react';
 import Link from 'next/link';
 import { default as cn } from 'classnames';
@@ -25,7 +25,7 @@ const ProductCategoryList = ({
 			>
 				<span>{category.name}</span>
 				<span>
-					<FontAwesomeIcon icon="chevron-right" />
+					{/* <FontAwesomeIcon icon="chevron-right" /> */}
 				</span>
 				{category.subcategories.length > 0 && (
 					<>
@@ -67,13 +67,13 @@ const ShopCategory = () => {
 	return (
 		<>
 			<div className="relative">
-				<div className="absolute w-56 z-20 bg-white rounded-md shadow-lg">
+				<div className="absolute w-56 z-20 bg-white  shadow-lg">
 					<div className="flex flex-col">
 						<div className="w-full">
-							<div className="flex items-center justify-between relative text-white bg-ecolap-gray py-3 px-5 rounded-t-md hover:bg-ecolap-gray-h">
+							<div className="flex items-center justify-between relative text-white bg-zinc-950 py-3 px-5 hover:bg-ecolap-gray-h font-bold">
 								Shop by Department
 								<span>
-									{isShopByCategoryCollapsed ? (
+									{/*isShopByCategoryCollapsed ? (
 										<FontAwesomeIcon
 											icon="chevron-up"
 											onClick={toggleShopBuCategory}
@@ -85,7 +85,7 @@ const ShopCategory = () => {
 											onClick={toggleShopBuCategory}
 											className="cursor-pointer"
 										/>
-									)}
+									)*/}
 								</span>
 							</div>
 						</div>
@@ -97,10 +97,10 @@ const ShopCategory = () => {
 							<ProductCategoryList categoryList={productCategories} />
 							<a
 								href="#"
-								className="w-full block py-3 px-5 bg-ecolap-green text-white rounded-b-md hover:no-underline hover:text-white"
+								className="w-full block py-3 px-5 bg-ecolap-green text-white hover:no-underline hover:text-white"
 							>
 								<span className="mr-1 text-base">
-									<FontAwesomeIcon icon={['far', 'clock']} />
+									{/* <FontAwesomeIcon icon={['far', 'clock']} /> */}
 								</span>
 								<span className="text-uppercase text-base font-bold">
 									Promotions
@@ -129,10 +129,10 @@ const NavBarProductCategory = () => {
 			{/*#region Mobile daily deals */}
 			<div className="px-2 flex items-center h-12 justify-between bg-secondary lg:px-16 lg:hidden">
 				<div>
-					<FontAwesomeIcon
+					{/* <FontAwesomeIcon
 						icon={['far', 'clock']}
 						className="text-white mr-1"
-					/>
+					/> */}
 					<a
 						href="#"
 						className="text-white hover:no-underline hover:text-white"
@@ -140,10 +140,8 @@ const NavBarProductCategory = () => {
 						<span className="text-uppercase">Promotions</span>
 					</a>
 				</div>
-				<Link href="/">
-					<a className="text-white font-weight-bold hover:no-underline hover:text-white">
+				<Link href="/" className="text-white font-weight-bold hover:no-underline hover:text-white">
 						View More
-					</a>
 				</Link>
 			</div>
 			{/*#endregion */}
@@ -158,16 +156,16 @@ const NavBarProductCategory = () => {
 						<button
 							onClick={navigateToShoppingHome}
 							type="button"
-							className="block w-2/5 rounded-lg drop-shadow-lg p-3 bg-slate-300 cursor-pointer hover:animate-heartbeat hover:scale-105"
+							className="block w-2/5  drop-shadow-lg p-3 bg-slate-100 cursor-pointer hover:animate-heartbeat hover:scale-105"
 						>
-							<p className="text-center">Shopping</p>
+							<p className="text-center font-medium ">Shopping</p>
 						</button>
 						<button
 							onClick={navigateToMobilityHome}
 							type="button"
-							className="block w-2/5 rounded-lg drop-shadow-lg p-3 bg-slate-300 cursor-pointer hover:animate-heartbeat hover:scale-105"
+							className="block w-2/5 drop-shadow-lg p-3 bg-zinc-950 cursor-pointer hover:animate-heartbeat hover:scale-105"
 						>
-							<p className="text-center">Mobility</p>
+							<p className="text-center text-white font-medium">Mobility</p>
 						</button>
 					</div>
 				</div>

@@ -1,4 +1,7 @@
 import * as React from 'react';
+// eslint-disable-next-line import/no-cycle
+import {User as AuthUser} from '@/hooks/context/AuthContext';
+
 
 export type User = {
 	username: string;
@@ -12,7 +15,7 @@ export type UserLogin = {
 }
 
 export type UIState = {
-	user: User | null;
+	user?: User;
 	isShopByCategoryCollapsed: boolean;
 	cartItems: CartItem[];
 	wishList?: Product[];
@@ -38,18 +41,21 @@ export type BikeCartItem = {
 export type CartItem = {
 	/** id: Items are expected to have the same id as the one of its product instance */
 	id: number;
+	Users_permissions_user?: AuthUser;
 	product: Product;
-	productInstances: number;
+	quantity: number;
 };
 
 type IncreaseProductQuantity = {
 	type: 'INCREASE_PRODUCT_QUANTITY';
 	payload: Product;
+	quantity: number;
 };
 
 type DecreaseProductQuantity = {
 	type: 'DECREASE_PRODUCT_QUANTITY';
 	payload: Product;
+	quantity: number;
 };
 
 type PatchCart = {
@@ -65,6 +71,7 @@ type AddBikeToCart = {
 type AddProductToCart = {
 	type: 'ADD_PRODUCT_TO_CART';
 	payload: Product;
+	authUser: AuthUser;
 };
 
 type RemoveProductFromCart = {
@@ -154,10 +161,10 @@ export type Product = {
 	isInStock: boolean;
 	isFreeForDelivery?: boolean;
 	deliveryFees?: number;
-} & GetCustomTypeName;
+};
 
 export type Bike = {
 	id: number;
 	name: string;
 	image: string;
-} & GetCustomTypeName;
+};

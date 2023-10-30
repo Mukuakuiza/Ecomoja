@@ -3,13 +3,15 @@ import { useContext } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/common';
 import { UIContext } from '@/hooks/context/UIContext';
-import { handleAddProductToCart } from '@/helpers/main';
+import { addProductToCart } from '@/helpers/main';
 import { Product } from '@/types/AppTypes';
+import AuthContext, { AuthState } from '@/hooks/context/AuthContext';
 
 type WishListItemProps = { product: Product };
 
 const WishListItem = ({ product }: WishListItemProps) => {
 	const { dispatch } = useContext(UIContext);
+	const { user } = useContext<AuthState>(AuthContext);
 
 	const {
 		name,
@@ -71,7 +73,7 @@ const WishListItem = ({ product }: WishListItemProps) => {
 							secondary
 							className="w-full mb-2 bg-secondary lg:w-52"
 							onClick={() => {
-								handleAddProductToCart(product, dispatch);
+								addProductToCart(product, dispatch, user);
 								dispatch({ type: 'TOGGLE_MODAL' });
 							}}
 						>

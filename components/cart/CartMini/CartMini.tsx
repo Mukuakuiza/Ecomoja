@@ -5,7 +5,7 @@ import { UIContext } from '@/hooks/context/UIContext';
 import s from '@/components/cart/CartNavBarView/Cart.module.scss';
 import { calculateCartTotal } from '@/helpers/main';
 import { Button } from '@/components/common';
-import { CartMiniItem } from '@/components/cart';
+import CartMiniItem from '@/components/cart/CartItem';
 
 const CartMini = () => {
 	const { cartItems } = React.useContext(UIContext);
@@ -14,32 +14,31 @@ const CartMini = () => {
 		<div className={s.cartMini}>
 			<div
 				className={cn(
-					{ hidden: cartItems.length > 0 },
+					cartItems?{ hidden: cartItems.length > 0 }:"",
 					'h-40 flex items-center justify-center',
 				)}
 			>
 				<p>Your cart is empty</p>
 			</div>
-			<div className={cn({ hidden: cartItems.length === 0 })}>
+			<div className={cn(cartItems?{ hidden: cartItems.length === 0 }:"")}>
 				<div>
-					{cartItems.map((item) => (
+					{cartItems? cartItems.map((item) => (
 						<CartMiniItem cartItem={item} key={item.id} />
-					))}
+					)):""}
 				</div>
 				<div>
 					<div className="py-2 px-5 border-t-2 border-b-2 border-solid border-gray-300 flex justify-end font-bold">
-						Total: R {calculateCartTotal(cartItems)}
+						Total: R {cartItems?calculateCartTotal(cartItems):""}
 					</div>
-					<div className="flex justify-between px-6 my-3">
+					<div className="flex space-evenly px-2 my-3">
 						<Button secondary className="w-1/2 mr-2">
 							<span className="material-icons text-base mr-1">lock</span>
 							<span>Checkout</span>
 						</Button>
-						<Link href="/cart" passHref>
+						<Link className="hover:no-underline" href="/cart" passHref>
 							<Button
 								secondary
-								className="w-1/2 hover:text-white hover:no-underline"
-								as="a"
+								className="w-full hover:text-white hover:no-underline"
 							>
 								<span className="material-icons text-base mr-1">
 									shopping_cart

@@ -13,9 +13,9 @@ import LoginButton from '@/components/core/LoginButton';
 import AuthContext, { AuthState } from '@/hooks/context/AuthContext';
 
 const NavBar = () => {
-	const { dispatch, cartItems } = React.useContext(UIContext);
+	const { dispatch, cartItems, wishList } = React.useContext(UIContext);
 	const { isAuthenticated, user } = React.useContext<AuthState>(AuthContext);
-	
+
 	const toggleDrawer = () => {
 		dispatch({ type: 'TOGGLE_MOBILE_MENU' });
 	};
@@ -35,10 +35,8 @@ const NavBar = () => {
 				</div>
 
 				<div className="flex">
-					<Link href="/">
-						<a className="flex items-center">
+					<Link href="/" className="flex items-center">
 							<Logo width={250} height={65} />
-						</a>
 					</Link>
 				</div>
 				<div className="hidden mx-3 lg:flex-1 lg:flex lg:items-center">
@@ -57,25 +55,22 @@ const NavBar = () => {
 							<LoginButton />
 						</li>
 						<li className="p-2">
-							<Link href="#">
-								<a className="whitespace-nowrap">Orders</a>
+							<Link href="#" className="whitespace-nowrap">Orders
 							</Link>
 						</li>
 						<li className="p-2 relative">
-							<Link href="#">
-								<a className="whitespace-nowrap">
+							<Link href="#" className="whitespace-nowrap">
 									<span>My Ecomoja</span>
 									<span className="ml-1">
 										<span>
-											<FontAwesomeIcon
+											{/* <FontAwesomeIcon
 												icon="sort-down"
 												className={styles['sort-down']}
-											/>
+											/> */}
 										</span>
 										{/* TODO: Add sort up icon */}
 										{/* <FontAwesomeIcon icon="sort-up" className={styles['sort-up']} /> */}
 									</span>
-								</a>
 							</Link>
 
 							<div className={styles['nav-expand']}>
@@ -83,7 +78,7 @@ const NavBar = () => {
 									{
 										isAuthenticated() && <li className="py-1 px-3">
 											<p>Signed in as {user.username}</p>
-										</li>	
+										</li>
 									}
 									<li className="py-1 px-3">
 										<a href="#">My Ecomoja</a>
@@ -115,13 +110,13 @@ const NavBar = () => {
 					</ul>
 					<ul className="flex items-center ml-1">
 						<li className="mr-2">
-							<Link href="/wishlist">
-								<a
-									href="#"
-									className="flex items-center justify-center text-white rounded-full w-8 h-8 text-base bg-red-500 hover:bg-red-600 hover:text-white hover:no-underline"
+							<Link href="/wishlist"
+									className="flex text-white items-center justify-center rounded-3xl w-12 h-8 text-base bg-red-500 hover:bg-red-600 hover:text-white hover:no-underline"
 								>
-									<FontAwesomeIcon icon="heart" />
-								</a>
+								<span className="material-icons text-base mr-1">
+								favorite
+								</span>
+								<span>{wishList !== null ? wishList?.length : 0}</span>
 							</Link>
 						</li>
 						<li>
@@ -132,17 +127,15 @@ const NavBar = () => {
 				{/* Mobile Icons */}
 				<div className="flex items-center ml-auto lg:hidden">
 					<button
-						className="h-8 p-1 text-base flex items-center justify-center"
+						className="h-8 p-1 bg-inherit text-base flex items-center justify-center"
 						type="button"
 					>
-						<FontAwesomeIcon icon="search" />
+						<span className="material-icons">search</span>
 					</button>
-					<Link href="/cart">
-						<a className="h-8 ml-1 p-1 text-base flex items-center justify-center hover:text-gray-700">
+					<Link href="/cart"className="h-8 ml-1 p-1 text-base flex items-center justify-center hover:text-gray-700">
 							<Badge badgeContent={cartItems.length} color="secondary">
 								<ShoppingCartIcon color="action" />
 							</Badge>
-						</a>
 					</Link>
 				</div>
 			</div>

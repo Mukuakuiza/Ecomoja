@@ -5,29 +5,33 @@ import {UIContext} from '@/hooks/context/UIContext';
 import {Banner} from '@/components/layout';
 import FeaturedPartners from '@/components/core/FeaturedPartners';
 import {Product} from '@/types/AppTypes';
+import {getEcoProducts} from '@/helpers/main';
+import { NEXT_URL } from '../config';
+
+export const getServerSideProps = (async (context) => {
+	const res = await fetch(`${NEXT_URL}/api/getAllProducts?populate=*`)
+	const allProducts = await res.json()
+	const ecoProducts:Product[] = getEcoProducts(allProducts);
+	return { props: { ecoProducts } }
+  })
 
 const slideImages: { id: string; image: string }[] = [
 	{
 		id: 'home-page1',
-		image: '/assets/HomePage_1.png',
+		image: '/assets/manonbike.png',
 	},
 	{
 		id: 'home-pag2',
-		image: '/assets/HomePage_2.png',
+		image: '/assets/EBIKE.png',
 	},
 	{
 		id: 'home-page3',
 		image:
-			'https://images.unsplash.com/photo-1564419320408-38e24e038739?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80',
-	},
-	{
-		id: 'home-page4',
-		image:
-			'https://images.pexels.com/photos/4792666/pexels-photo-4792666.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+			'/assets/recycle_image.jpg',
 	},
 ];
 
-export default function Home() {
+export default function Home({ecoProducts}) {
 	const {
 		dispatch,
 		layoutProp,
@@ -51,41 +55,9 @@ export default function Home() {
 				});
 			}
 		},
-		[dispatch],
+		[dispatch, layoutProp],
 	);
 
-	const [products, setProducts] = React.useState<Product[]>([]);
-
-	React.useEffect(
-		() => {
-			fetch('http://localhost:1337/api/products?populate=*')
-				.then((res) => res.json())
-				.then((resBody) => {
-
-					const generatedProducts: Product[] = [];
-
-					resBody.data.forEach((productItem) => {
-						generatedProducts.push({
-							id: productItem.id,
-							name: productItem.attributes.name,
-							description: productItem.attributes.description,
-							image: productItem.attributes.images.data[0].attributes.formats.thumbnail.url,
-							currentPrice: productItem.attributes.price,
-							oldPrice: productItem.attributes.oldPrice,
-							rating: 4,
-							numberOfVotes: 90,
-							categories: ['Gardening'],
-							vendor: 'CMK',
-							isInStock: productItem.attributes.isInStock,
-							getCustomTypeName: () => 'Product',
-						});
-
-						setProducts(generatedProducts);
-					})
-				})
-				.catch(error => console.error(error));
-		},
-		[]);
 
 	return (
 		<>
@@ -93,7 +65,7 @@ export default function Home() {
 				<title>Ecomoja | Shopping | Home</title>
 			</Head>
 			<Banner slides={slideImages}/>
-			<Catalogue catalogue={products} title="Groceries"/>
+			{ecoProducts? <Catalogue catalogue={ecoProducts} title="Groceries"/> : ""}
 			<FeaturedPartners/>
 		</>
 	);

@@ -68,12 +68,12 @@ const Register = () => {
 					<section className='pt-8 pb-8 pl-8 w-full md:pr-32 lg:pr-48'>
 						<div className='mb-4'>
 							<h1 className="mb-2">Create an account</h1>
-							<p className="">or <Link href='/login'><a>log in to your account</a></Link></p>
+							<p className="">or <Link href='/login'>log in to your account</Link></p>
 						</div>
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<div className='mb-4'>
 								<TextField
-									error={errors.username}
+									error={!!errors.username}
 									fullWidth
 									id='username'
 									label='Username'
@@ -84,7 +84,7 @@ const Register = () => {
 							</div>
 							<div className='mb-4'>
 								<TextField
-									error={errors.email}
+									error={!!errors.email}
 									fullWidth
 									id='email'
 									label='Email'
@@ -95,7 +95,7 @@ const Register = () => {
 							</div>
 							<div className='mb-4'>
 								<TextField
-									error={errors.password}
+									error={!!errors.password}
 									fullWidth
 									id='password'
 									label='Password'
@@ -107,7 +107,7 @@ const Register = () => {
 							</div>
 							<div className='mb-6'>
 								<TextField
-									error={errors.confirmPassword}
+									error={!!errors.confirmPassword}
 									fullWidth
 									id='confirmPassword'
 									label='Confirm password'
@@ -125,9 +125,7 @@ const Register = () => {
 				</div>
 				<div className='flex flex-1 bg-gray-600 items-center justify-center'>
 					<Link href="/">
-						<a>
 							<Logo width={250} height={65} />
-						</a>
 					</Link>
 				</div>
 			</div>

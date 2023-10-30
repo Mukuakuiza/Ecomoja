@@ -2,18 +2,37 @@ import * as React from 'react';
 import Image from 'next/image';
 import { CartItem as CartItemType } from '@/types/AppTypes';
 import { UIContext } from '@/hooks/context/UIContext';
-import { removeCartItem, storeCartToLocalStorage } from '@/helpers/main';
+import { getAllCartItems, removeCartItem, removeItemFromCart, storeCartItemsInLocalStorage } from '@/helpers/main';
+import AuthContext, { AuthState } from '@/hooks/context/AuthContext';
+import { useContext } from 'react';
 
 const CartMiniItem = ({ cartItem }: { cartItem: CartItemType }) => {
 	const { dispatch, cartItems } = React.useContext(UIContext);
+	const {user} = useContext<AuthState>(AuthContext);
 
 	const handleOnRemoveCartItem = () => {
+		if(user){
+			dispatch({
+				type: 'REMOVE_PRODUCT_FROM_CART',
+				payload: cartItem.product,
+			});
+
+			removeItemFromCart(cartItem.id);
+			getAllCartItems(user).then((allCartItems)=>{
+				dispatch({ type: 'PATCH_CART', payload: allCartItems });
+			}).catch((err)=>{
+				console.log(err);
+				
+			});
+		}
+
 		dispatch({
 			type: 'REMOVE_PRODUCT_FROM_CART',
 			payload: cartItem.product,
 		});
 		const newCartItems = removeCartItem(cartItems, cartItem.product.id);
-		storeCartToLocalStorage(newCartItems);
+		dispatch({ type: 'PATCH_CART', payload: newCartItems });
+		storeCartItemsInLocalStorage(newCartItems);
 	};
 	return (
 		<div className="flex px-5 py-2 h-20">
@@ -42,7 +61,7 @@ const CartMiniItem = ({ cartItem }: { cartItem: CartItemType }) => {
 					</div>
 				</div>
 				<div className="flex">
-					<span>Qty: {cartItem.productInstances}</span>
+					<span>Qty: {cartItem.quantity}</span>
 					<span className="ml-auto">R {cartItem.product.currentPrice}</span>
 				</div>
 			</div>

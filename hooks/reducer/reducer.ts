@@ -1,8 +1,9 @@
+/* eslint-disable no-param-reassign */
 import { CartItem, UIAction, UIState } from '@/types/AppTypes';
-import { addNewCartItem, removeCartItem } from '@/helpers/main';
+import { addNewCartItem, removeStateCartItem, storeCartItemsInLocalStorage } from '@/helpers/main';
 
 const reducer = (state: UIState, action: UIAction): UIState => {
-	let newCartItems: CartItem[];
+	let newCartItems: CartItem[] = [];
 
 	switch (action.type) {
 		case 'SET_CURRENT_USER':
@@ -23,10 +24,10 @@ const reducer = (state: UIState, action: UIAction): UIState => {
 		case 'INCREASE_PRODUCT_QUANTITY':
 			state.cartItems.forEach((cartItem: CartItem) => {
 				if (cartItem.id === action.payload.id) {
-					cartItem.productInstances += 1;
+					cartItem.quantity = action.quantity;
 				}
 			});
-
+			storeCartItemsInLocalStorage(state.cartItems);
 			return {
 				...state,
 			};
@@ -35,12 +36,12 @@ const reducer = (state: UIState, action: UIAction): UIState => {
 			state.cartItems.forEach((cartItem: CartItem) => {
 				if (
 					cartItem.id === action.payload.id &&
-					cartItem.productInstances !== 0
+					cartItem.quantity !== 0
 				) {
-					cartItem.productInstances -= 1;
+					cartItem.quantity = action.quantity;
 				}
 			});
-
+			storeCartItemsInLocalStorage(state.cartItems);
 			return {
 				...state,
 			};
@@ -58,32 +59,29 @@ const reducer = (state: UIState, action: UIAction): UIState => {
 		case 'ADD_PRODUCT_TO_CART':
 			// eslint-disable-next-line no-case-declarations
 			const { cartItems } = state;
-
-			newCartItems = addNewCartItem(cartItems, action.payload);
+			newCartItems = addNewCartItem(cartItems, action.payload, action.authUser);
 			return {
 				...state,
 				cartItems: newCartItems,
 			};
 
 		case 'ADD_PRODUCT_TO_WISHLIST':
-			const newWishList = [action.payload, ...state.wishList];
 			return {
 				...state,
-				wishList: newWishList,
+				wishList: [action.payload, ...state.wishList],
 			};
 		case 'REMOVE_PRODUCT_FROM_WISHLIST':
-			const filteredWishList = state.wishList.filter(item => item.id !== action.payload.id);
 			return {
 				...state,
-				wishList: filteredWishList,
+				wishList: state.wishList.filter(item => item.id !== action.payload.id),
 			};
 
 		case 'REMOVE_PRODUCT_FROM_CART':
 			// all cart items have the same id as their product
-			newCartItems = removeCartItem(state.cartItems, action.payload.id);
+
 			return {
 				...state,
-				cartItems: newCartItems,
+				cartItems: removeStateCartItem(state.cartItems, action.payload.id),
 			};
 
 		case 'TOGGLE_MOBILE_MENU':

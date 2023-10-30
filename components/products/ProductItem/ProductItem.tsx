@@ -5,18 +5,22 @@ import { toast } from 'react-toastify';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { default as cn } from 'classnames';
+import { useContext } from 'react';
 import {
 	addNewCartItem,
-	handleAddProductToCart,
-	storeCartToLocalStorage,
+	createNewCartItem,
+	getAllCartItems,
+	saveProductToUserCart,
+	saveTempCart,
+	storeCartItemsInLocalStorage,
 } from '@/helpers/main';
 import ToggleWishlistIcon from '@/components/products/ToggleWishlistIcon';
 import { UIContext } from '@/hooks/context/UIContext';
 import Button from '@/components/common/Button';
+import { CartItem, Product } from '@/types/AppTypes';
+import AuthContext, { AuthState } from '@/hooks/context/AuthContext';
 import s from './ProductItem.module.scss';
-import { Product } from '@/types/AppTypes';
 
 type ProductProps = { item: Product };
 
@@ -24,15 +28,59 @@ const ProductItem = ({ item }: ProductProps) => {
 	const { dispatch, cartItems } = React.useContext(UIContext);
 	const { id, name, image, currentPrice, oldPrice, rating, numberOfVotes } =
 		item;
+	const {isAuthenticated ,user } = useContext<AuthState>(AuthContext);
+	const auth = isAuthenticated();
+
+	const handleAddProductToCart = (event) => {
+		event.preventDefault();
+		event.stopPropagation();
+		toast.success("You've added a new item to your cart", {
+			position: 'top-right',
+			autoClose: 1500,
+			hideProgressBar: false,
+			closeOnClick: true,
+			pauseOnHover: true,
+			draggable: true,
+			progress: undefined,
+		});
+		
+		if (auth) {
+			const newCartItem = createNewCartItem(cartItems, item);
+			if(newCartItem.length === 0){
+				saveProductToUserCart(item, user, cartItems).then((res)=>{
+					if(res.ok){
+						getAllCartItems(user).then((allCartItems)=>{
+							dispatch({ type: 'PATCH_CART', payload: allCartItems });
+						}).catch((err)=>{
+							console.log(err);
+						});
+					}
+				});	
+			}else{
+				const cart:CartItem[] = newCartItem.slice();
+				cart[0].quantity = 1;
+				saveTempCart(cart).then((res) => {
+					if(res.ok && res !== null){
+						getAllCartItems(user).then((allCartItems)=>{
+							dispatch({ type: 'PATCH_CART', payload: allCartItems });
+						}).catch((err)=>{
+							console.log(err);
+						});
+					}
+				});
+			}
+		} else {
+			const newCartItems = addNewCartItem(cartItems, item, user);
+			dispatch({ type: 'PATCH_CART', payload: newCartItems });
+			storeCartItemsInLocalStorage(newCartItems);
+		}
+	}
 
 	return (
-		<Link href={`/products/${id}`}>
-			<a
-				className={cn(
-					'product-item block hover:text-gray-700 hover:no-underline',
-					s.ProductItemContainer,
-				)}
-			>
+		<Link href={`/products/${id}`} className={cn(
+			'product-item block hover:text-gray-700 hover:no-underline mx-1 my-2 sm:grow',
+			s.ProductItemContainer,
+		)}>
 				<Card sx={{ maxWidth: 345 }} className="relative">
 					<CardMedia
 						component="img"
@@ -60,7 +108,7 @@ const ProductItem = ({ item }: ProductProps) => {
 							</div>
 							<div className="w-full flex-1 flex items-center justify-center mt-1">
 								<span className="mr-1">
-									<FontAwesomeIcon icon="star" className="text-yellow-500" />
+									{/* <FontAwesomeIcon icon="star" className="text-yellow-500" /> */}
 								</span>
 								<span className="mr-1">{rating}</span>
 								<span className="text-muted">({numberOfVotes})</span>
@@ -70,35 +118,19 @@ const ProductItem = ({ item }: ProductProps) => {
 							<ToggleWishlistIcon
 								product={item}
 								className={cn(
-									'absolute top-1 right-1 md:block mr-3',
+									'absolute top-1 right-1 md:block mr-3 bg-transparent',
 									s.wishListToggleIcon,
 								)}
 							/>
 							<Button
 								secondary
-								onClick={(event) => {
-									event.preventDefault();
-									event.stopPropagation();
-									toast.success("You've added a new item to your cart", {
-										position: 'top-right',
-										autoClose: 1500,
-										hideProgressBar: false,
-										closeOnClick: true,
-										pauseOnHover: true,
-										draggable: true,
-										progress: undefined,
-									});
-									handleAddProductToCart(item, dispatch);
-									const newCartItems = addNewCartItem(cartItems, item);
-									storeCartToLocalStorage(newCartItems);
-								}}
+								onClick={handleAddProductToCart}
 							>
 								Add to cart
 							</Button>
 						</div>
 					</CardContent>
 				</Card>
-			</a>
 		</Link>
 	);
 };

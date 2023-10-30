@@ -1,20 +1,25 @@
 import { useRouter } from 'next/router';
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { NEXT_URL } from '@/config/index';
+// eslint-disable-next-line import/no-cycle
+import { CartItem } from '@/types/AppTypes';
+// eslint-disable-next-line import/no-cycle
+import { insertItemsInLocalStorage } from '@/helpers/main';
+
 
 export type AuthState = {
 	user: any;
 	error: any;
 	register: (username: string, email: string, password: string) => Promise<void>;
 	login: (email: string, password: string) => Promise<void>;
-	logout: () => void;
+	logout: (cartItems:CartItem[]) => void;
 	isAuthenticated: () => boolean;
 }
 
 export type User = {
 	id: number;
 	username: string;
-	email: string; 
+	email: string;
 	provider: string;
 	confirmed: string;
 	blocked: string;
@@ -31,13 +36,17 @@ export const AuthProvider = ({ children }) => {
 	const router = useRouter();
 
 	const checkIfUserLoggedIn = useCallback(async () => {
-		const res = await fetch(`${NEXT_URL}/api/user`);
-		console.log(res);
+		try{
+			const res = await fetch(`${NEXT_URL}/api/user`);
 		const data = await res.json();
 		if (res.ok) {
 			setUser(data.user);
 		} else {
 			setUser(null);
+		}
+		}
+		catch(err){
+			console.error(err);
 		}
 	}, []);
 
@@ -73,40 +82,47 @@ export const AuthProvider = ({ children }) => {
 
 	// Login user
 	const login = async ( identifier, password ) => {
-		const res = await fetch(`${NEXT_URL}/api/login`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				identifier,
-				password,
-			}),
-		});
-
-		const data = await res.json();
-
-		if (res.ok) {
-			setUser(data.user);
-			router.push('/');
-		} else {
-			setError(data.message);
-			setError(null);
+		try{
+			const res = await fetch(`${NEXT_URL}/api/login`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					identifier,
+					password,
+				}),
+			});
+	
+			const data = await res.json();
+	
+			if (res.ok) {
+				setUser(data.user);
+				router.push('/');
+			} else {
+				setError(data.message);
+				setError(null);
+			}
 		}
+		catch(err){
+			console.error(err);
+		}
+
 	};
 
 	// Logout user
-	const logout = async () => {
+	const logout = async (cartItems) => {
 		const res = await fetch(`${NEXT_URL}/api/logout`, {
 			method: 'POST',
 		});
 
 		if (res.ok) {
+			insertItemsInLocalStorage(cartItems);
 			setUser(null);
 			router.push('/');
 		}
 	};
-	
+
 	// Check if user is authenticated
 	const isAuthenticated = () => !!user;
 

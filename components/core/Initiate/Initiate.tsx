@@ -1,17 +1,29 @@
-import * as React from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { ToastContainer } from 'react-toastify';
-import { getCartFromLocalStorage } from '@/helpers/main';
+import { initializeCartItems, updateFromLocalStorage } from '@/helpers/main';
 import { UIContext } from '@/hooks/context/UIContext';
+import AuthContext, { AuthState } from '@/hooks/context/AuthContext';
 
 const Initiate = () => {
-	const { dispatch } = React.useContext(UIContext);
-	React.useEffect(() => {
-		const storedCartItems = getCartFromLocalStorage();
+	const { dispatch } = useContext(UIContext);
+	const { user } = useContext<AuthState>(AuthContext);
 
-		if (storedCartItems !== null) {
-			dispatch({ type: 'PATCH_CART', payload: storedCartItems });
+	useEffect(() => {
+		const getCartItems = async()=> {
+			try{
+				await initializeCartItems(user, dispatch);
+			}catch(err){
+				// eslint-disable-next-line no-console
+				console.error(new Error('Loading user cart'));
+			}
 		}
-	}, []);
+		getCartItems();
+	}, [dispatch, user]);
+
+
+	useEffect(() => {
+		updateFromLocalStorage(dispatch);
+	}, [dispatch]);
 
 	return (
 		<>
